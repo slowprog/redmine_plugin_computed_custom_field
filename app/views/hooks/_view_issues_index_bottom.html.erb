@@ -5,7 +5,7 @@
         if User.current.allowed_to?(:view_time_entries, issue.project)
 
             issue.visible_custom_field_values.each do |value|
-              next unless value.custom_field.computed? && value.custom_field.enabled_query?
+              next unless value.custom_field.computed?
 
               if !custom_fields.key?(value.custom_field.id)
                 custom_fields[value.custom_field.id] = {
@@ -13,6 +13,7 @@
                     'name' => value.custom_field.name,
                     'formula' => value.custom_field.formula_query,
                     'format' => value.custom_field.output_format,
+                    'enabled' => value.custom_field.enabled_query?,
                 }
               end
 
@@ -49,7 +50,7 @@
 <% if allowed_to_view_time_entries && !custom_fields.empty? -%>
 <p class="other-formats">
   <% custom_fields.each do |key, cf|
-
+    if cf['enabled']
       formula = cf['formula']
       custom_fields.each do |k, cf_value|
         str = '["' + cf_value['values'].join('", "') + '"]'
@@ -74,7 +75,8 @@
       result = eval(formula)
     %>
 
-    <strong><%= cf['name'] %>:</strong> <%= result %>
+      <strong><%= cf['name'] %>:</strong> <%= result %>
+    <% end %>
   <% end %>
 </p>
 <% end -%>
