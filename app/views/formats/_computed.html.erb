@@ -26,15 +26,15 @@
 </p>
 
 <p>
-  <%= label_tag l(:field_datetime_format) %>
+  <%= label_tag l(:label_enabled_query) %>
   <%= check_box 'custom_field', 'enabled_query', {}, '1', '0' %>
 </p>
 
 <p class="wrapper_formula_query"
   <%= (custom_field.enabled_query? ? '' : 'style=display:none;') %>
 >
-  <%= label_tag l(:field_formula) %>
-  <%= text_area_tag 'custom_field[formula_query]', custom_field.formula_query %>
+  <%= label_tag l(:label_formula_query) %>
+  <%= text_area_tag 'custom_field[formula_query]', custom_field.formula_query, placeholder: l(:placeholder_formula_query) %>
 </p>
 
 <script type="text/javascript">

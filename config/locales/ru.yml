@@ -5,3 +5,6 @@ ru:
   field_datetime_format: Формат даты/времени
   label_available_custom_fields: Доступные поля
   error_while_formula_computing: Ошибка вычисления по формуле в поле "%{custom_field_name}" — %{message}
+  label_enabled_query: Включить вычисления для списка задач
+  label_formula_query: Вычисления для списка задач
+  placeholder_formula_query: Массив данных списка задач values (текущий поле) или %{cf_values_<id>}
