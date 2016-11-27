@@ -15,6 +15,10 @@ module ComputedCustomFieldPlugin
       field_format == 'computed'
     end
 
+    def enabled_query?
+      enabled_query == '1'
+    end
+
     def fields_ids_from_formula
       return unless computed?
       formula.scan(/%\{cf_(\d+)\}/).flatten.map(&:to_i)

@@ -9,6 +9,8 @@ module ComputedCustomFieldPlugin
       field_attributes :formula
       field_attributes :output_format
       field_attributes :datetime_format
+      field_attributes :enabled_query
+      field_attributes :formula_query
 
       def label
         "label_computed"

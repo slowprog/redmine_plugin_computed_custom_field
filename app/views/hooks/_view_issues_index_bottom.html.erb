@@ -1,0 +1,80 @@
+<%
+    allowed_to_view_time_entries = true
+    custom_fields = {}
+    @issues.each do |issue|
+        if User.current.allowed_to?(:view_time_entries, issue.project)
+
+            issue.visible_custom_field_values.each do |value|
+              next unless value.custom_field.computed? && value.custom_field.enabled_query?
+
+              if !custom_fields.key?(value.custom_field.id)
+                custom_fields[value.custom_field.id] = {
+                    'values' => [],
+                    'name' => value.custom_field.name,
+                    'formula' => value.custom_field.formula_query,
+                    'format' => value.custom_field.output_format,
+                }
+              end
+
+              begin
+                result = value.to_s
+
+                result = case value.custom_field.output_format
+                   when 'datetime'
+                     result.to_datetime rescue nil
+                   when 'float'
+                     result.to_f
+                   when 'int' || 'percentage'
+                     result.to_i
+                   when 'bool'
+                     result ? '1' : '0'
+                   else
+                     result.to_s
+                 end
+
+                custom_fields[value.custom_field.id]['values'].push(result)
+              rescue StandardError, SyntaxError => e
+                self.errors.add :base, l(:error_while_formula_computing,
+                                         custom_field_name: value.custom_field.name,
+                                         message: e.message)
+              end
+            end
+        else
+            allowed_to_view_time_entries = false if not User.current.admin?
+            break
+        end
+    end
+%>
+
+<% if allowed_to_view_time_entries && !custom_fields.empty? -%>
+<p class="other-formats">
+  <% custom_fields.each do |key, cf|
+
+      formula = cf['formula']
+      custom_fields.each do |k, cf_value|
+        str = '["' + cf_value['values'].join('", "') + '"]'
+        str += case cf_value['format']
+        when 'datetime'
+          '.map{ |val| val.to_datetime rescue nil }'
+        when 'float'
+          '.map{ |val| val.to_f }'
+        when 'int' || 'percentage'
+          '.map{ |val| val.to_i }'
+        when 'bool'
+          '.map{ |val| val ? "1" : "0" }'
+        else
+            '.map{ |val| val.to_s }'
+        end
+
+        formula.gsub!("%{cf_values_#{k}}", str)
+      end
+
+      values = cf['values']
+      # use values or %{cf_values_<id>}
+      result = eval(formula)
+    %>
+
+    <strong><%= cf['name'] %>:</strong> <%= result %>
+  <% end %>
+</p>
+<% end -%>

@@ -24,6 +24,19 @@
     <img src="/images/help.png" alt="strftime">
   </a>
 </p>
+
+<p>
+  <%= label_tag l(:field_datetime_format) %>
+  <%= check_box 'custom_field', 'enabled_query', {}, '1', '0' %>
+</p>
+
+<p class="wrapper_formula_query"
+  <%= (custom_field.enabled_query? ? '' : 'style=display:none;') %>
+>
+  <%= label_tag l(:field_formula) %>
+  <%= text_area_tag 'custom_field[formula_query]', custom_field.formula_query %>
+</p>
+
 <script type="text/javascript">
     (function() {
         var output_format = $("#custom_field_output_format");
@@ -50,6 +63,9 @@
             $(this).find("option:selected").each(function() {
                 formula.val(formula.val() + '%{cf_' + $(this).val() + '} ');
             });
+        });
+        $("#custom_field_enabled_query").click(function(e) {
+            $('.wrapper_formula_query').slideToggle();
         });
     }())
 </script>
